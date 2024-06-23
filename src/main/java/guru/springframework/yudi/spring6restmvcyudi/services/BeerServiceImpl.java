@@ -1,7 +1,7 @@
 package guru.springframework.yudi.spring6restmvcyudi.services;
 
 import guru.springframework.yudi.spring6restmvcyudi.model.Beer;
-import guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -10,10 +10,12 @@ import java.util.UUID;
 
 import static guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle.PALE_ALE;
 
+@Slf4j
 @Service
 public class BeerServiceImpl implements BeerService{
     @Override
     public Beer getBeerById(UUID id) {
+        log.debug("In BeerServiceImpl --> getBeerById(UUID id)");
         return Beer.builder()
                 .id(id)
                 .beerName("Galaxy Cat")
