@@ -1,13 +1,14 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
+import guru.springframework.yudi.spring6restmvcyudi.model.Beer;
 import guru.springframework.yudi.spring6restmvcyudi.model.Customer;
 import guru.springframework.yudi.spring6restmvcyudi.services.CustomerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,5 +28,13 @@ public class CustomerController {
     @RequestMapping(method = RequestMethod.GET)
     public List<Customer> listCustomers(){
         return customerService.listCustomers();
+    }
+
+    @PostMapping
+    public ResponseEntity saveNewCustomer(@RequestBody Customer customer) {
+        Customer savedNewCustomer = customerService.saveNewCustomer(customer);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/api/v1/customer/" + savedNewCustomer.getId().toString());
+        return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 }
