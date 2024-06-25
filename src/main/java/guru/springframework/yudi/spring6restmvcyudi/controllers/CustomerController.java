@@ -1,6 +1,5 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
-import guru.springframework.yudi.spring6restmvcyudi.model.Beer;
 import guru.springframework.yudi.spring6restmvcyudi.model.Customer;
 import guru.springframework.yudi.spring6restmvcyudi.services.CustomerService;
 import lombok.AllArgsConstructor;
@@ -36,5 +35,11 @@ public class CustomerController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/api/v1/customer/" + savedNewCustomer.getId().toString());
         return new ResponseEntity(headers, HttpStatus.CREATED);
+    }
+
+    @PutMapping(path = "/{customerId}")
+    public ResponseEntity updateCustomerById(@PathVariable("customerId") UUID customerId, @RequestBody Customer customer){
+        customerService.updateCustomerById(customerId, customer);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
