@@ -103,4 +103,12 @@ public class BeerServiceImpl implements BeerService{
         existing.setUpdateDate(LocalDateTime.now());
         beerMap.put(existing.getId(), existing);
     }
+
+    /**
+     * @param beerId
+     */
+    @Override
+    public void deleteById(UUID beerId) {
+        beerMap.remove(beerId);
+    }
 }
