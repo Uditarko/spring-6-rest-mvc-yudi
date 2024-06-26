@@ -1,6 +1,5 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.yudi.spring6restmvcyudi.model.Customer;
 import guru.springframework.yudi.spring6restmvcyudi.services.CustomerService;
@@ -18,8 +17,8 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
@@ -37,7 +36,7 @@ class CustomerControllerTest {
     CustomerServiceImpl customerServiceImpl;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         customerServiceImpl = new CustomerServiceImpl();
     }
 
@@ -47,8 +46,8 @@ class CustomerControllerTest {
 
         given(customerService.getCustomerById(any(UUID.class))).willReturn(testCustomer);
 
-        mockMvc.perform(get("/api/v1/customer/"+testCustomer.getId().toString())
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/customer/" + testCustomer.getId().toString())
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testCustomer.getId().toString())))
                 .andExpect(jsonPath("$.name", is(testCustomer.getName())));
@@ -59,11 +58,11 @@ class CustomerControllerTest {
         given(customerService.listCustomers()).willReturn(customerServiceImpl.listCustomers());
 
         mockMvc.perform(get("/api/v1/customer").accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()",is(customerServiceImpl.listCustomers().size())));
+                .andExpect(jsonPath("$.length()", is(customerServiceImpl.listCustomers().size())));
     }
 
     @Test
-    void  testSaveNewCustomer() throws Exception {
+    void testSaveNewCustomer() throws Exception {
         Customer customer = customerServiceImpl.listCustomers().getFirst();
         customer.setId(null);
         customer.setVersion(null);
@@ -73,12 +72,24 @@ class CustomerControllerTest {
         given(customerService.saveNewCustomer(customer)).willReturn(customerServiceImpl.listCustomers().get(1));
 
         mockMvc.perform(post("/api/v1/customer")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(customer)))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(customer)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"));
     }
 
+    @Test
+    void testUpdateCustomerById() throws Exception {
+        Customer customer = customerServiceImpl.listCustomers().getFirst();
+
+        mockMvc.perform(put("/api/v1/customer/" + customer.getId().toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(customer)))
+                .andExpect(status().isNoContent());
+
+        verify(customerService).updateCustomerById(customer.getId(), customer);
+    }
 
 }
