@@ -1,5 +1,6 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.yudi.spring6restmvcyudi.model.Beer;
 import guru.springframework.yudi.spring6restmvcyudi.services.BeerService;
 import guru.springframework.yudi.spring6restmvcyudi.services.BeerServiceImpl;
@@ -28,6 +29,9 @@ class BeerControllerTest {
     @MockBean
     BeerService beerService;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     BeerServiceImpl beerServiceImpl = new BeerServiceImpl();
 
     @Test
@@ -51,5 +55,11 @@ class BeerControllerTest {
         mockMvc.perform(get("/api/v1/beer")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()",is(3)));
+    }
+
+    @Test
+    void testSaveNewBeer() throws Exception {
+        Beer beer = beerServiceImpl.listBeers().getFirst();
+        System.out.println(objectMapper.writeValueAsString(beer));
     }
 }
