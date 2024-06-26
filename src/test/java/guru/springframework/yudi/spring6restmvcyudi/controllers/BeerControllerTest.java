@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.yudi.spring6restmvcyudi.model.Beer;
 import guru.springframework.yudi.spring6restmvcyudi.services.BeerService;
 import guru.springframework.yudi.spring6restmvcyudi.services.BeerServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -32,7 +34,12 @@ class BeerControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    BeerServiceImpl beerServiceImpl = new BeerServiceImpl();
+    BeerServiceImpl beerServiceImpl;
+
+    @BeforeEach
+    public void setUp(){
+        beerServiceImpl = new BeerServiceImpl();
+    }
 
     @Test
     void getBeerById() throws Exception {
@@ -60,6 +67,17 @@ class BeerControllerTest {
     @Test
     void testSaveNewBeer() throws Exception {
         Beer beer = beerServiceImpl.listBeers().getFirst();
-        System.out.println(objectMapper.writeValueAsString(beer));
+        beer.setCreatedDate(null);
+        beer.setId(null);
+        beer.setVersion(null);
+        beer.setUpdateDate(null);
+        given(beerService.saveNewBeer(beer)).willReturn(beerServiceImpl.listBeers().get(1));
+
+        mockMvc.perform(post("/api/v1/beer")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beer)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"));
     }
 }
