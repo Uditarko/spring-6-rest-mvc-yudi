@@ -2,7 +2,7 @@ package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
 import guru.springframework.yudi.spring6restmvcyudi.model.Customer;
 import guru.springframework.yudi.spring6restmvcyudi.services.CustomerService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 @RequestMapping(path = "/api/v1/customer")
 public class CustomerController {
