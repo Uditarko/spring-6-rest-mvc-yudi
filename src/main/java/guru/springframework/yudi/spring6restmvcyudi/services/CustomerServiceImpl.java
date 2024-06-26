@@ -2,6 +2,7 @@ package guru.springframework.yudi.spring6restmvcyudi.services;
 
 import guru.springframework.yudi.spring6restmvcyudi.model.Customer;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -87,5 +88,17 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
     public void deleteById(UUID customerId) {
         customerMap.remove(customerId);
+    }
+
+    /**
+     * @param customerId
+     * @param customer
+     */
+    @Override
+    public void patchById(UUID customerId, Customer customer) {
+        Customer existing = customerMap.get(customerId);
+        if(StringUtils.hasText(customer.getName())){
+            existing.setName(customer.getName());
+        }
     }
 }
