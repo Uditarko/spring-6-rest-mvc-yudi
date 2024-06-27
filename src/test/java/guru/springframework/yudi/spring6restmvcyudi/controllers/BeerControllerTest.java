@@ -7,12 +7,15 @@ import guru.springframework.yudi.spring6restmvcyudi.services.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +38,12 @@ class BeerControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Captor
+    ArgumentCaptor<UUID> uuidArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<Beer> beerArgumentCaptor;
 
     BeerServiceImpl beerServiceImpl;
 
@@ -103,9 +112,26 @@ class BeerControllerTest {
         mockMvc.perform(delete("/api/v1/beer/" + beer.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        verify(beerService).deleteById(captor.capture());
-        assertThat(captor.getValue()).isEqualTo(beer.getId());
+        verify(beerService).deleteById(uuidArgumentCaptor.capture());
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(beer.getId());
+    }
+
+    @Test
+    void testPatchBeerById() throws Exception {
+        Beer toUpdate = beerServiceImpl.listBeers().getFirst();
+
+        Map<String, String> valueMap = new HashMap<>();
+        valueMap.put("beerName", toUpdate.getBeerName() + " patched");
+
+        mockMvc.perform(patch("/api/v1/beer/"+ toUpdate.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(valueMap)))
+                .andExpect(status().isNoContent());
+
+        verify(beerService).patchById(uuidArgumentCaptor.capture(), beerArgumentCaptor.capture());
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(toUpdate.getId());
+        assertThat(beerArgumentCaptor.getValue().getBeerName()).isEqualTo(toUpdate.getBeerName() + " patched");
     }
 }
