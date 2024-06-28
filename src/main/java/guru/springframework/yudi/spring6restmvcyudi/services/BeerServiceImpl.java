@@ -62,9 +62,9 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public Beer getBeerById(UUID id) {
+    public Optional<Beer> getBeerById(UUID id) {
         log.debug("In BeerServiceImpl --> getBeerById(UUID id)");
-        return beerMap.get(id);
+        return Optional.of(beerMap.get(id));
     }
 
     @Override
@@ -95,15 +95,18 @@ public class BeerServiceImpl implements BeerService {
      */
     @Override
     public void updateBeerById(UUID id, Beer beer) {
-        Beer existing = getBeerById(id);
-        existing.setBeerName(beer.getBeerName());
-        existing.setBeerStyle(beer.getBeerStyle());
-        existing.setPrice(beer.getPrice());
-        existing.setUpc(beer.getUpc());
-        existing.setQuantityOnHand(beer.getQuantityOnHand());
-        existing.setVersion(existing.getVersion() + 1);
-        existing.setUpdateDate(LocalDateTime.now());
-        beerMap.put(existing.getId(), existing);
+        Optional<Beer> existing = getBeerById(id);
+
+        if(existing.isPresent()) {
+            existing.get().setBeerName(beer.getBeerName());
+            existing.get().setBeerStyle(beer.getBeerStyle());
+            existing.get().setPrice(beer.getPrice());
+            existing.get().setUpc(beer.getUpc());
+            existing.get().setQuantityOnHand(beer.getQuantityOnHand());
+            existing.get().setVersion(existing.get().getVersion() + 1);
+            existing.get().setUpdateDate(LocalDateTime.now());
+            beerMap.put(existing.get().getId(), existing.get());
+        }
     }
 
     /**
@@ -120,21 +123,24 @@ public class BeerServiceImpl implements BeerService {
      */
     @Override
     public void patchById(UUID beerId, Beer beer) {
-        Beer existing = getBeerById(beerId);
-        if (StringUtils.hasText(beer.getBeerName())) {
-            existing.setBeerName(beer.getBeerName());
-        }
-        if (StringUtils.hasText(beer.getUpc())) {
-            existing.setUpc(beer.getUpc());
-        }
-        if (beer.getBeerStyle() != null) {
-            existing.setBeerStyle(beer.getBeerStyle());
-        }
-        if (beer.getPrice() != null) {
-            existing.setPrice(beer.getPrice());
-        }
-        if (beer.getQuantityOnHand() != null) {
-            existing.setQuantityOnHand(beer.getQuantityOnHand());
+        Optional<Beer> existing = getBeerById(beerId);
+
+        if(existing.isPresent()) {
+            if (StringUtils.hasText(beer.getBeerName())) {
+                existing.get().setBeerName(beer.getBeerName());
+            }
+            if (StringUtils.hasText(beer.getUpc())) {
+                existing.get().setUpc(beer.getUpc());
+            }
+            if (beer.getBeerStyle() != null) {
+                existing.get().setBeerStyle(beer.getBeerStyle());
+            }
+            if (beer.getPrice() != null) {
+                existing.get().setPrice(beer.getPrice());
+            }
+            if (beer.getQuantityOnHand() != null) {
+                existing.get().setQuantityOnHand(beer.getQuantityOnHand());
+            }
         }
 
     }

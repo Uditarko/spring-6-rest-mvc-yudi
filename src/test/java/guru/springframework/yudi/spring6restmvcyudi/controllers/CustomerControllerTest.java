@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static guru.springframework.yudi.spring6restmvcyudi.controllers.CustomerController.PATH_CUSTOMER;
@@ -57,7 +58,7 @@ class CustomerControllerTest {
     void getCustomerById() throws Exception {
         Customer testCustomer = customerServiceImpl.listCustomers().getFirst();
 
-        given(customerService.getCustomerById(any(UUID.class))).willReturn(testCustomer);
+        given(customerService.getCustomerById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomer));
 
         mockMvc.perform(get(PATH_CUSTOMER_ID, testCustomer.getId())
                         .accept(MediaType.APPLICATION_JSON))
