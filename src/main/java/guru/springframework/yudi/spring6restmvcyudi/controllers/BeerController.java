@@ -20,12 +20,6 @@ public class BeerController {
     public static final String BEER_PATH_ID = BEER_PATH + "/{beerId}";
     private final BeerService beerService;
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity handleNotFoundException(){
-        log.debug("In Exception Handler for NotFoundException");
-        return ResponseEntity.notFound().build();
-    }
-
     @RequestMapping(path = BEER_PATH_ID, method = RequestMethod.GET)
     public Beer getBeerById(@PathVariable("beerId") UUID id) {
         log.debug("In BeerController --> getBeerById(UUID id)");
