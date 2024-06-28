@@ -1,7 +1,11 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 import java.security.PrivilegedActionException;
 
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Value Not Found")
 public class NotFoundException extends RuntimeException{
     /**
      * Constructs a new exception with {@code null} as its detail message.
