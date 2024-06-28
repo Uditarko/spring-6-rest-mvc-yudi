@@ -1,21 +1,21 @@
 package guru.springframework.yudi.spring6restmvcyudi.services;
 
-import guru.springframework.yudi.spring6restmvcyudi.model.Beer;
+import guru.springframework.yudi.spring6restmvcyudi.model.BeerDTO;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface BeerService {
-    Optional<Beer> getBeerById(UUID id);
+    Optional<BeerDTO> getBeerById(UUID id);
 
-    List<Beer> listBeers();
+    List<BeerDTO> listBeers();
 
-    Beer saveNewBeer(Beer beer);
+    BeerDTO saveNewBeer(BeerDTO beerDTO);
 
-    void updateBeerById(UUID id, Beer beer);
+    void updateBeerById(UUID id, BeerDTO beerDTO);
 
     void deleteById(UUID beerId);
 
-    void patchById(UUID beerId, Beer beer);
+    void patchById(UUID beerId, BeerDTO beerDTO);
 }
