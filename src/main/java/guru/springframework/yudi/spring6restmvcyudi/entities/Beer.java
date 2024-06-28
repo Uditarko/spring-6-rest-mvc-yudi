@@ -1,9 +1,7 @@
 package guru.springframework.yudi.spring6restmvcyudi.entities;
 
 import guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -18,6 +16,9 @@ import java.util.UUID;
 @Entity
 public class Beer {
     @Id
+    /* since hibernate 6.2 */
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36, columnDefinition = "varchar", updatable = false, nullable = false)
     private UUID id;
     @Version
     private Integer version;
