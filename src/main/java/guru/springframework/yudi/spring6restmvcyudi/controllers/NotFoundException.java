@@ -2,7 +2,7 @@ package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
 import java.security.PrivilegedActionException;
 
-public class NotFoundException extends Exception{
+public class NotFoundException extends RuntimeException{
     /**
      * Constructs a new exception with {@code null} as its detail message.
      * The cause is not initialized, and may subsequently be initialized by a
