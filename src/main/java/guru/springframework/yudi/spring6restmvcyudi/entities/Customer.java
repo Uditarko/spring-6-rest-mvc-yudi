@@ -14,6 +14,7 @@ import java.util.UUID;
 @Entity
 public class Customer {
     @Id
+    /* since hibernate 6.2 */
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(length = 36, columnDefinition = "varchar", updatable = false, nullable = false)
     private UUID id;
