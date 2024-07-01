@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {TestMapperConfiguration.class})
+@SpringBootTest
 class BootStrapDataTest {
     @Autowired
     BeerRepository beerRepository;
@@ -20,6 +20,7 @@ class BootStrapDataTest {
     @Autowired
     CustomerRepository customerRepository;
 
+    @Autowired
     BootStrapData bootStrapData;
 
     @Autowired
@@ -28,15 +29,10 @@ class BootStrapDataTest {
     @Autowired
     BeerMapper beerMapper;
 
-    @BeforeEach
-    void setUp(){
-        bootStrapData = new BootStrapData(beerMapper, customerMapper, beerRepository, customerRepository);
-    }
 
     @Test
     void testRun() {
         assertThat(beerRepository.count()).isEqualTo(3);
         assertThat(customerRepository.count()).isEqualTo(3);
-
     }
 }
