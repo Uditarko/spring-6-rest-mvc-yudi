@@ -40,4 +40,19 @@ class BeerControllerIT {
         List<BeerDTO> beers = beerController.listBeers();
         assertThat(beers.size()).isEqualTo(0);
     }
+
+    @Test
+    void getBeerByIdFound() {
+        BeerDTO foundBeer  = beerController.getBeerById(beerRepository.findAll().getFirst().getId());
+        assertThat(foundBeer.getId()).isNotNull();
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void getBeerByIdNotFound() {
+        beerRepository.deleteAll();
+        assertThrows(NotFoundException.class, () -> beerController.getBeerById(UUID.randomUUID()));
+    }
+
 }
