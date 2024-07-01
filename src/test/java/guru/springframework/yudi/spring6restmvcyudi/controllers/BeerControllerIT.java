@@ -1,5 +1,6 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
+import guru.springframework.yudi.spring6restmvcyudi.entities.Beer;
 import guru.springframework.yudi.spring6restmvcyudi.model.BeerDTO;
 import guru.springframework.yudi.spring6restmvcyudi.repositories.BeerRepository;
 import jakarta.transaction.Transactional;
@@ -7,9 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,4 +59,16 @@ class BeerControllerIT {
         assertThrows(NotFoundException.class, () -> beerController.getBeerById(UUID.randomUUID()));
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    void testSavedNewBeer() {
+        ResponseEntity responseEntity = beerController.saveNewBeer(BeerDTO.builder().beerName("New Beer").build());
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        String id = responseEntity.getHeaders().getLocation().getPath().split("/")[4].strip();
+        System.out.println(id);
+        Optional<Beer> savedBeer = beerRepository.findById(UUID.fromString(id));
+        assertThat(savedBeer.isPresent()).isTrue();
+        assertThat(savedBeer.get().getBeerName()).isEqualTo("New Beer");
+    }
 }
