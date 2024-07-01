@@ -107,4 +107,13 @@ class BeerControllerIT {
                 .build();
         assertThrows(NotFoundException.class, () -> beerController.updateBeerById(UUID.randomUUID(), inBeerDto));
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testdeleteByIdFound() {
+        Beer beer = beerRepository.findAll().getFirst();
+        beerController.deleteBeerById(beer.getId());
+        assertThat(beerRepository.findById(beer.getId()).isPresent()).isFalse();
+    }
 }
