@@ -85,6 +85,7 @@
                 <version>3.13.0</version>
                 <executions>
                     <execution>
+                        <id>default-compile</id>
                         <configuration>
                             <source>${java.version}</source>
                             <target>${java.version}</target>
