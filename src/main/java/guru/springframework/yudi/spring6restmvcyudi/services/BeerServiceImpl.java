@@ -92,9 +92,10 @@ public class BeerServiceImpl implements BeerService {
     /**
      * @param id
      * @param beerDTO
+     * @return
      */
     @Override
-    public void updateBeerById(UUID id, BeerDTO beerDTO) {
+    public Optional<BeerDTO> updateBeerById(UUID id, BeerDTO beerDTO) {
         Optional<BeerDTO> existing = getBeerById(id);
 
         if(existing.isPresent()) {
@@ -106,6 +107,10 @@ public class BeerServiceImpl implements BeerService {
             existing.get().setVersion(existing.get().getVersion() + 1);
             existing.get().setUpdateDate(LocalDateTime.now());
             beerMap.put(existing.get().getId(), existing.get());
+            return existing;
+        }
+        else{
+            return Optional.empty();
         }
     }
 

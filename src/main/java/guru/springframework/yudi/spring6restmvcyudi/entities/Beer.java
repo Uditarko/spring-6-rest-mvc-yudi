@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
+@ToString
 public class Beer {
     @Id
     /* since hibernate 6.2 */

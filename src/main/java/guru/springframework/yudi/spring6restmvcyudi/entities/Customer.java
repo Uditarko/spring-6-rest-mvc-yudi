@@ -12,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
+@ToString
 public class Customer {
     @Id
     /* since hibernate 6.2 */

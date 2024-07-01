@@ -2,6 +2,7 @@ package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
 import guru.springframework.yudi.spring6restmvcyudi.entities.Beer;
 import guru.springframework.yudi.spring6restmvcyudi.model.BeerDTO;
+import guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle;
 import guru.springframework.yudi.spring6restmvcyudi.repositories.BeerRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -70,5 +71,26 @@ class BeerControllerIT {
         Optional<Beer> savedBeer = beerRepository.findById(UUID.fromString(id));
         assertThat(savedBeer.isPresent()).isTrue();
         assertThat(savedBeer.get().getBeerName()).isEqualTo("New Beer");
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    void updateBeerByIdWhenExists() {
+        Beer beerToUpdate = beerRepository.findAll().getFirst();
+        BeerDTO inBeerDto = BeerDTO.builder()
+                .beerName("Updated")
+                .beerStyle(BeerStyle.GOSE)
+                .id(null)
+                .version(null)
+                .build();
+        ResponseEntity responseEntity = beerController.updateBeerById(beerToUpdate.getId(), inBeerDto);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        /*Not required to fetch again as the test is Transactional*/
+        assertThat(beerToUpdate.getBeerName()).isEqualTo(inBeerDto.getBeerName());
+        assertThat(beerToUpdate.getBeerStyle()).isEqualTo(BeerStyle.GOSE);
+        assertThat(beerToUpdate.getUpc()).isNull();
+
     }
 }
