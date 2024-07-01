@@ -93,4 +93,18 @@ class BeerControllerIT {
         assertThat(beerToUpdate.getUpc()).isNull();
 
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    void updateBeerByIdWhenNotExists() {
+        beerRepository.deleteAll();
+        BeerDTO inBeerDto = BeerDTO.builder()
+                .beerName("Updated")
+                .beerStyle(BeerStyle.GOSE)
+                .id(null)
+                .version(null)
+                .build();
+        assertThrows(NotFoundException.class, () -> beerController.updateBeerById(UUID.randomUUID(), inBeerDto));
+    }
 }
