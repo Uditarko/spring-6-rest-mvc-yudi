@@ -11,35 +11,40 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @Primary
 @RequiredArgsConstructor
-public class BeerServiceJPA implements BeerService{
+public class BeerServiceJPA implements BeerService {
 
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
 
     /**
-     * @param id 
+     * @param id
      * @return
      */
     @Override
     public Optional<BeerDTO> getBeerById(UUID id) {
-        return Optional.empty();
+
+        return Optional.ofNullable(beerMapper.beerToBeerDto(
+                beerRepository.findById(id).orElse(null)));
     }
 
     /**
-     * @return 
+     * @return
      */
     @Override
     public List<BeerDTO> listBeers() {
-        return List.of();
+        return beerRepository.findAll().stream()
+                .map(beerMapper::beerToBeerDto)
+                .collect(Collectors.toList());
     }
 
     /**
-     * @param beerDTO 
+     * @param beerDTO
      * @return
      */
     @Override
@@ -48,7 +53,7 @@ public class BeerServiceJPA implements BeerService{
     }
 
     /**
-     * @param id 
+     * @param id
      * @param beerDTO
      */
     @Override
@@ -57,7 +62,7 @@ public class BeerServiceJPA implements BeerService{
     }
 
     /**
-     * @param beerId 
+     * @param beerId
      */
     @Override
     public void deleteById(UUID beerId) {
@@ -65,7 +70,7 @@ public class BeerServiceJPA implements BeerService{
     }
 
     /**
-     * @param beerId 
+     * @param beerId
      * @param beerDTO
      */
     @Override

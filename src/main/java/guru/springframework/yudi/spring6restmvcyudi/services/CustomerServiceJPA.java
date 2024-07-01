@@ -11,35 +11,39 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Primary
 @RequiredArgsConstructor
-public class CustomerServiceJPA implements CustomerService{
+public class CustomerServiceJPA implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
     /**
-     * @param id 
+     * @param id
      * @return
      */
     @Override
     public Optional<CustomerDTO> getCustomerById(UUID id) {
-        return Optional.empty();
+        return Optional.ofNullable(customerMapper.customerToCustomerDto(
+                customerRepository.findById(id).orElse(null)));
     }
 
     /**
-     * @return 
+     * @return
      */
     @Override
     public List<CustomerDTO> listCustomers() {
-        return List.of();
+        return customerRepository.findAll().stream()
+                .map(customerMapper::customerToCustomerDto)
+                .collect(Collectors.toList());
     }
 
     /**
-     * @param customerDTO 
+     * @param customerDTO
      * @return
      */
     @Override
@@ -48,7 +52,7 @@ public class CustomerServiceJPA implements CustomerService{
     }
 
     /**
-     * @param id 
+     * @param id
      * @param customerDTO
      */
     @Override
@@ -57,7 +61,7 @@ public class CustomerServiceJPA implements CustomerService{
     }
 
     /**
-     * @param customerId 
+     * @param customerId
      */
     @Override
     public void deleteById(UUID customerId) {
@@ -65,7 +69,7 @@ public class CustomerServiceJPA implements CustomerService{
     }
 
     /**
-     * @param customerId 
+     * @param customerId
      * @param customerDTO
      */
     @Override
