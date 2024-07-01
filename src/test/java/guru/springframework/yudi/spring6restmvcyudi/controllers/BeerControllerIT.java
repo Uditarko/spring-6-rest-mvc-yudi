@@ -113,7 +113,17 @@ class BeerControllerIT {
     @Rollback
     public void testdeleteByIdFound() {
         Beer beer = beerRepository.findAll().getFirst();
-        beerController.deleteBeerById(beer.getId());
+        ResponseEntity responseEntity = beerController.deleteBeerById(beer.getId());
         assertThat(beerRepository.findById(beer.getId()).isPresent()).isFalse();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testdeleteByIdNotFound() {
+        Beer beer = beerRepository.findAll().getFirst();
+        beerRepository.deleteById(beer.getId());
+        assertThrows(NotFoundException.class, () -> beerController.deleteBeerById(beer.getId()));
     }
 }
