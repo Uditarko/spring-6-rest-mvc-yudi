@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,15 +66,19 @@ public class BeerServiceJPA implements BeerService {
     public Optional<BeerDTO> updateBeerById(UUID id, BeerDTO beerDTO) {
         AtomicReference<Optional<BeerDTO>> returnBeerDto = new AtomicReference<>();
         beerRepository.findById(id).ifPresentOrElse(
-                elem -> {elem.setBeerName(beerDTO.getBeerName());
-                elem.setBeerStyle(beerDTO.getBeerStyle());
-                elem.setPrice(beerDTO.getPrice());
-                elem.setUpc(beerDTO.getUpc());
-                elem.setQuantityOnHand(beerDTO.getQuantityOnHand());
-                elem.setUpdateDate(LocalDateTime.now());
-                Beer savedBeer = beerRepository.save(elem);
-                returnBeerDto.set(Optional.of(beerMapper.beerToBeerDto(savedBeer)));}
-        , () -> { returnBeerDto.set(Optional.empty());});
+                elem -> {
+                    elem.setBeerName(beerDTO.getBeerName());
+                    elem.setBeerStyle(beerDTO.getBeerStyle());
+                    elem.setPrice(beerDTO.getPrice());
+                    elem.setUpc(beerDTO.getUpc());
+                    elem.setQuantityOnHand(beerDTO.getQuantityOnHand());
+                    elem.setUpdateDate(LocalDateTime.now());
+                    Beer savedBeer = beerRepository.save(elem);
+                    returnBeerDto.set(Optional.of(beerMapper.beerToBeerDto(savedBeer)));
+                }
+                , () -> {
+                    returnBeerDto.set(Optional.empty());
+                });
 
         return returnBeerDto.get();
     }
@@ -84,11 +89,10 @@ public class BeerServiceJPA implements BeerService {
      */
     @Override
     public Boolean deleteById(UUID beerId) {
-        if(beerRepository.existsById(beerId)) {
+        if (beerRepository.existsById(beerId)) {
             beerRepository.deleteById(beerId);
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -96,9 +100,33 @@ public class BeerServiceJPA implements BeerService {
     /**
      * @param beerId
      * @param beerDTO
+     * @return
      */
     @Override
-    public void patchById(UUID beerId, BeerDTO beerDTO) {
-
+    public Optional<BeerDTO> patchById(UUID beerId, BeerDTO beerDTO) {
+        AtomicReference<Optional<BeerDTO>> returnBeerDto = new AtomicReference<>();
+        beerRepository.findById(beerId).ifPresentOrElse(elem -> {
+                    if (StringUtils.hasText(beerDTO.getBeerName())) {
+                        elem.setBeerName(beerDTO.getBeerName());
+                    }
+                    if (StringUtils.hasText(beerDTO.getUpc())) {
+                        elem.setUpc(beerDTO.getUpc());
+                    }
+                    if (beerDTO.getBeerStyle() != null) {
+                        elem.setBeerStyle(beerDTO.getBeerStyle());
+                    }
+                    if (beerDTO.getPrice() != null) {
+                        elem.setPrice(beerDTO.getPrice());
+                    }
+                    if (beerDTO.getQuantityOnHand() != null) {
+                        elem.setQuantityOnHand(beerDTO.getQuantityOnHand());
+                    }
+                    returnBeerDto.set(Optional.of(beerMapper.beerToBeerDto(beerRepository.save(elem))));
+                }, () -> {
+                    returnBeerDto.set(Optional.empty());
+                }
+        );
+        return returnBeerDto.get();
     }
+
 }

@@ -137,7 +137,7 @@ class BeerControllerTest {
 
         Map<String, String> valueMap = new HashMap<>();
         valueMap.put("beerName", toUpdateDTO.getBeerName() + " patched");
-
+        given(beerService.patchById(uuidArgumentCaptor.capture(), beerArgumentCaptor.capture())).willReturn(Optional.of(toUpdateDTO));
         mockMvc.perform(patch(BEER_PATH_ID, toUpdateDTO.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)

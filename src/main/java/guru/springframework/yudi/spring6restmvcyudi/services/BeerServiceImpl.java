@@ -127,9 +127,10 @@ public class BeerServiceImpl implements BeerService {
     /**
      * @param beerId
      * @param beerDTO
+     * @return
      */
     @Override
-    public void patchById(UUID beerId, BeerDTO beerDTO) {
+    public Optional<BeerDTO> patchById(UUID beerId, BeerDTO beerDTO) {
         Optional<BeerDTO> existing = getBeerById(beerId);
 
         if(existing.isPresent()) {
@@ -149,6 +150,6 @@ public class BeerServiceImpl implements BeerService {
                 existing.get().setQuantityOnHand(beerDTO.getQuantityOnHand());
             }
         }
-
+        return existing;
     }
 }

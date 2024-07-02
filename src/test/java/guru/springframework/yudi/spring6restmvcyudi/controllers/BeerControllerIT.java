@@ -126,4 +126,25 @@ class BeerControllerIT {
         beerRepository.deleteById(beer.getId());
         assertThrows(NotFoundException.class, () -> beerController.deleteBeerById(beer.getId()));
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    void testPatchBeerByIdSuccess() {
+        Beer existing = beerRepository.findAll().getFirst();
+        BeerDTO update = BeerDTO.builder().beerName("Patched").build();
+        ResponseEntity responseEntity = beerController.patchBeerById(existing.getId(), update);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(existing.getBeerName()).isEqualTo("Patched");
+        assertThat(existing.getUpc()).isNotNull();
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    void testPatchBeerByIdNotFound(){
+        beerRepository.deleteAll();
+        BeerDTO update = BeerDTO.builder().beerName("Patched").build();
+        assertThrows(NotFoundException.class, () -> beerController.patchBeerById(UUID.randomUUID(), update));
+    }
 }
