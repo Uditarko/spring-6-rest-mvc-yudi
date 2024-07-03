@@ -26,7 +26,9 @@ import static guru.springframework.yudi.spring6restmvcyudi.controllers.BeerContr
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.is;
 
 @Slf4j
 @SpringBootTest
@@ -181,6 +183,7 @@ class BeerControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(valueMap)))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)))
                 .andReturn();
 
         System.out.println(mvcResult.getResponse().getContentAsString());
