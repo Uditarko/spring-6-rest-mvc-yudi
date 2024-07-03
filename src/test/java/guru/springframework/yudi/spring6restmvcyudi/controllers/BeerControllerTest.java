@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -128,6 +130,30 @@ class BeerControllerTest {
     }
 
     @Test
+    void testSaveNewBeerWithAllNull() throws Exception {
+        BeerDTO beerDTO = beerServiceImpl.listBeers().getFirst();
+        beerDTO.setBeerName(null);
+        beerDTO.setBeerStyle(null);
+        beerDTO.setUpc(null);
+        beerDTO.setPrice(BigDecimal.ZERO);
+        beerDTO.setCreatedDate(null);
+        beerDTO.setId(null);
+        beerDTO.setVersion(null);
+        beerDTO.setUpdateDate(null);
+        System.out.println(beerDTO);
+        given(beerService.saveNewBeer(beerDTO)).willReturn(beerServiceImpl.listBeers().get(1));
+
+        MvcResult mvcResult = mockMvc.perform(post(BEER_PATH)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(6)))
+                .andReturn();
+        System.out.println(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
     void testUpdateBeerById() throws Exception {
         BeerDTO beerDTO = beerServiceImpl.listBeers().getFirst();
 
@@ -140,6 +166,27 @@ class BeerControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(beerService).updateBeerById(beerDTO.getId(), beerDTO);
+    }
+
+    @Test
+    void testUpdateBeerByIdWithReqAttrMissing() throws Exception {
+        BeerDTO beerDTO = beerServiceImpl.listBeers().getFirst();
+        beerDTO.setBeerName(null);
+        beerDTO.setBeerStyle(null);
+        beerDTO.setUpc(null);
+        beerDTO.setPrice(BigDecimal.ZERO);
+
+        given(beerService.updateBeerById(any(), any())).willReturn(Optional.of(beerDTO));
+
+        MvcResult mvcResult = mockMvc.perform(put(BEER_PATH_ID, beerDTO.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(6)))
+                .andReturn();
+        System.out.println(mvcResult.getResponse().getContentAsString());
+        verify(beerService, times(0)).updateBeerById(beerDTO.getId(), beerDTO);
     }
 
     @Test
