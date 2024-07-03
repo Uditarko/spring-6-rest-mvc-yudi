@@ -1,5 +1,6 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 @ControllerAdvice
 public class CustomErrorController {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity handleBindErrors(MethodArgumentNotValidException methodArgumentNotValidException){
         List<Map<String,String>> errorList = methodArgumentNotValidException.getFieldErrors().stream()
@@ -21,5 +23,10 @@ public class CustomErrorController {
                 }).toList();
 
         return ResponseEntity.badRequest().body(errorList);
+    }
+
+    @ExceptionHandler
+    ResponseEntity handleConstraintViolation(ConstraintViolationException exception){
+        return ResponseEntity.badRequest().build();
     }
 }

@@ -1,28 +1,36 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.yudi.spring6restmvcyudi.entities.Beer;
 import guru.springframework.yudi.spring6restmvcyudi.model.BeerDTO;
 import guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle;
 import guru.springframework.yudi.spring6restmvcyudi.repositories.BeerRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+import static guru.springframework.yudi.spring6restmvcyudi.controllers.BeerController.BEER_PATH_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @SpringBootTest
-/* Will not wire up web context but will wire up everything else opposite to test splices*/
+        /* Will not wire up web context but will wire up everything else opposite to test splices*/
 class BeerControllerIT {
 
     @Autowired
@@ -30,6 +38,19 @@ class BeerControllerIT {
 
     @Autowired
     BeerRepository beerRepository;
+
+    @Autowired
+    WebApplicationContext wac;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    MockMvc mockMvc;
+
+    @BeforeEach
+    void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+    }
 
     @Test
     void testListBeers() {
@@ -48,7 +69,7 @@ class BeerControllerIT {
 
     @Test
     void getBeerByIdFound() {
-        BeerDTO foundBeer  = beerController.getBeerById(beerRepository.findAll().getFirst().getId());
+        BeerDTO foundBeer = beerController.getBeerById(beerRepository.findAll().getFirst().getId());
         assertThat(foundBeer.getId()).isNotNull();
     }
 
@@ -142,9 +163,26 @@ class BeerControllerIT {
     @Test
     @Transactional
     @Rollback
-    void testPatchBeerByIdNotFound(){
+    void testPatchBeerByIdNotFound() {
         beerRepository.deleteAll();
         BeerDTO update = BeerDTO.builder().beerName("Patched").build();
         assertThrows(NotFoundException.class, () -> beerController.patchBeerById(UUID.randomUUID(), update));
+    }
+
+    /* from here the tests are written with web context*/
+    @Test
+    void testPatchBeerByIdBadName() throws Exception {
+        Beer existing = beerRepository.findAll().getFirst();
+        Map<String, String> valueMap = new HashMap<>();
+        valueMap.put("beerName", existing.getBeerName() + " patched1234567890123456789012345678901234567890123456789012345678901234567890");
+
+        MvcResult mvcResult = mockMvc.perform(patch(BEER_PATH_ID, existing.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(valueMap)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(mvcResult.getResponse().getContentAsString());
     }
 }
