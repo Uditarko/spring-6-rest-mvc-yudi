@@ -61,6 +61,7 @@ class BeerControllerTest {
 
         given(beerService.getBeerById(any(UUID.class))).willReturn(Optional.ofNullable(testBeerDTO));
 
+        assert testBeerDTO != null;
         mockMvc.perform(get(BEER_PATH_ID, UUID.randomUUID())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -102,6 +103,24 @@ class BeerControllerTest {
                         .content(objectMapper.writeValueAsString(beerDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"));
+    }
+
+    @Test
+    void testSaveNewBeerWithNullBeerName() throws Exception {
+        BeerDTO beerDTO = beerServiceImpl.listBeers().getFirst();
+        beerDTO.setBeerName(null);
+        beerDTO.setCreatedDate(null);
+        beerDTO.setId(null);
+        beerDTO.setVersion(null);
+        beerDTO.setUpdateDate(null);
+        System.out.println(beerDTO);
+        given(beerService.saveNewBeer(beerDTO)).willReturn(beerServiceImpl.listBeers().get(1));
+
+        mockMvc.perform(post(BEER_PATH)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDTO)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
