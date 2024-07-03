@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -28,11 +29,16 @@ public class Beer {
     private Integer version;
     @NotBlank
     @NotNull
+    //will throw data integrity violation once it hits the DB
+    @Column(length = 50)
+    //will throw constraint violation before hitting DB(validation phase)
+    @Size(max = 50)
     private String beerName;
     @NotNull
     private BeerStyle beerStyle;
     @NotNull
     @NotBlank
+    @Size(max = 255)
     private String upc;
     private Integer quantityOnHand;
     @NotNull
