@@ -1,6 +1,7 @@
 package guru.springframework.yudi.spring6restmvcyudi.controllers;
 
 import guru.springframework.yudi.spring6restmvcyudi.model.BeerDTO;
+import guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle;
 import guru.springframework.yudi.spring6restmvcyudi.services.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +30,8 @@ public class BeerController {
     }
 
     @RequestMapping(path = BEER_PATH, method = RequestMethod.GET)
-    public List<BeerDTO> listBeers() {
-        return beerService.listBeers();
+    public List<BeerDTO> listBeers(@RequestParam(required = false) String beerName, @RequestParam(required = false) BeerStyle beerStyle) {
+        return beerService.listBeers(beerName, beerStyle);
     }
 
     @PostMapping(path = BEER_PATH)

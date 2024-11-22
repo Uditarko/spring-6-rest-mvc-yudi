@@ -3,6 +3,7 @@ package guru.springframework.yudi.spring6restmvcyudi.services;
 import guru.springframework.yudi.spring6restmvcyudi.entities.Beer;
 import guru.springframework.yudi.spring6restmvcyudi.mappers.BeerMapper;
 import guru.springframework.yudi.spring6restmvcyudi.model.BeerDTO;
+import guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle;
 import guru.springframework.yudi.spring6restmvcyudi.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BeerServiceJPA implements BeerService {
 
+    public static final String DB_WILDCARD = "%";
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
 
@@ -41,8 +43,16 @@ public class BeerServiceJPA implements BeerService {
      * @return
      */
     @Override
-    public List<BeerDTO> listBeers() {
-        return beerRepository.findAll().stream()
+    public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle) {
+        List<Beer> beers;
+        if (StringUtils.hasText(beerName)) {
+            beers = beerRepository.findAllByBeerNameIsLikeIgnoreCase(DB_WILDCARD + beerName + DB_WILDCARD);
+        } else if (beerStyle != null) {
+            beers = beerRepository.findAllByBeerStyle(beerStyle);
+        } else {
+            beers = beerRepository.findAll();
+        }
+        return beers.stream()
                 .map(beerMapper::beerToBeerDto)
                 .collect(Collectors.toList());
     }

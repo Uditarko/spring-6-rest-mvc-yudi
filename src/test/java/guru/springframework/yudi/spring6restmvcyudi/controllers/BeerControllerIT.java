@@ -26,6 +26,7 @@ import static guru.springframework.yudi.spring6restmvcyudi.controllers.BeerContr
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.is;
@@ -56,8 +57,24 @@ class BeerControllerIT {
 
     @Test
     void testListBeers() {
-        List<BeerDTO> beers = beerController.listBeers();
-        assertThat(beers.size()).isEqualTo(3);
+        List<BeerDTO> beers = beerController.listBeers(null, null);
+        assertThat(beers.size()).isEqualTo(2413);
+    }
+
+    @Test
+    void testListBeersByName() throws Exception {
+        mockMvc.perform(get(BeerController.BEER_PATH)
+                        .queryParam("beerName", "%IPA%"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(336)));
+    }
+
+    @Test
+    void testListBeersByBeerStyle() throws Exception {
+        mockMvc.perform(get(BeerController.BEER_PATH)
+                        .queryParam("beerStyle", "IPA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(548)));
     }
 
     @Rollback
@@ -65,7 +82,7 @@ class BeerControllerIT {
     @Test
     void testEmptyListBeers() {
         beerRepository.deleteAll();
-        List<BeerDTO> beers = beerController.listBeers();
+        List<BeerDTO> beers = beerController.listBeers(null, null);
         assertThat(beers.size()).isEqualTo(0);
     }
 

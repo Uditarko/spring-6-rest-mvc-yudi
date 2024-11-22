@@ -1,18 +1,25 @@
 package guru.springframework.yudi.spring6restmvcyudi.repositories;
 
+import guru.springframework.yudi.spring6restmvcyudi.bootstrap.BootStrapData;
 import guru.springframework.yudi.spring6restmvcyudi.entities.Beer;
+import guru.springframework.yudi.spring6restmvcyudi.mappers.BeerMapperImpl;
+import guru.springframework.yudi.spring6restmvcyudi.mappers.CustomerMapperImpl;
 import guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle;
+import guru.springframework.yudi.spring6restmvcyudi.services.BeerCsvServiceImpl;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
+@Import({BootStrapData.class, BeerCsvServiceImpl.class, BeerMapperImpl.class, CustomerMapperImpl.class})
 class BeerRepositoryTest {
 
     @Autowired
@@ -50,5 +57,20 @@ class BeerRepositoryTest {
             beerRepository.flush();
         });
     }
+
+    @Test
+    void testFindAllByBeerNameIsLikeIgnoreCase(){
+        List<Beer> list = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%");
+
+        assertThat(list.size()).isEqualTo(336);
+    }
+
+    @Test
+    void testFindAllByBeerStyle(){
+        List<Beer> list = beerRepository.findAllByBeerStyle(BeerStyle.IPA);
+
+        assertThat(list.size()).isEqualTo(548);
+    }
+
 
 }
