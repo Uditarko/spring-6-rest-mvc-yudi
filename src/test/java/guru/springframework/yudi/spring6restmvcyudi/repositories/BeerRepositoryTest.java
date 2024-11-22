@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Import({BootStrapData.class, BeerCsvServiceImpl.class, BeerMapperImpl.class, CustomerMapperImpl.class})
 class BeerRepositoryTest {
 
+    public static final String BEER_NAME = "%IPA%";
     @Autowired
     BeerRepository beerRepository;
 
@@ -47,7 +48,7 @@ class BeerRepositoryTest {
 
     @Test
     void testSaveBeerNameTooLong() {
-        assertThrows(ConstraintViolationException.class,() -> {
+        assertThrows(ConstraintViolationException.class, () -> {
             beerRepository.save(Beer.builder()
                     .beerName("My Beer aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
                     .beerStyle(BeerStyle.PALE_ALE)
@@ -59,18 +60,22 @@ class BeerRepositoryTest {
     }
 
     @Test
-    void testFindAllByBeerNameIsLikeIgnoreCase(){
-        List<Beer> list = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%");
+    void testFindAllByBeerNameIsLikeIgnoreCase() {
+        List<Beer> list = beerRepository.findAllByBeerNameIsLikeIgnoreCase(BEER_NAME);
 
         assertThat(list.size()).isEqualTo(336);
     }
 
     @Test
-    void testFindAllByBeerStyle(){
+    void testFindAllByBeerStyle() {
         List<Beer> list = beerRepository.findAllByBeerStyle(BeerStyle.IPA);
 
         assertThat(list.size()).isEqualTo(548);
     }
 
-
+    @Test
+    void testFindAllByBeerNameIsLikeIgnoreCaseAndBeerStyle(){
+        List<Beer> list = beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle(BEER_NAME, BeerStyle.IPA);
+        assertThat(list.size()).isEqualTo(310);
+    }
 }

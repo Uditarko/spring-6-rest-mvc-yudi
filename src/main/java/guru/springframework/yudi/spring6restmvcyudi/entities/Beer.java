@@ -46,6 +46,7 @@ public class Beer {
     @NotBlank
     @Size(max = 255)
     private String upc;
+    @Column(columnDefinition = "integer default 0")
     private Integer quantityOnHand;
     @NotNull
     @Positive

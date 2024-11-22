@@ -7,6 +7,7 @@ import guru.springframework.yudi.spring6restmvcyudi.model.BeerStyle;
 import guru.springframework.yudi.spring6restmvcyudi.repositories.BeerRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ class BeerControllerIT {
 
     @Test
     void testListBeers() {
-        List<BeerDTO> beers = beerController.listBeers(null, null);
+        List<BeerDTO> beers = beerController.listBeers(null, null, null);
         assertThat(beers.size()).isEqualTo(2413);
     }
 
@@ -77,12 +78,32 @@ class BeerControllerIT {
                 .andExpect(jsonPath("$.size()", is(548)));
     }
 
+    @Test
+    void testListBeersByBeerNameAndBeerStyleAndShowInventory() throws Exception {
+        mockMvc.perform(get(BeerController.BEER_PATH)
+                        .queryParam("beerName", "%IPA%")
+                        .queryParam("beerStyle", "IPA")
+                        .queryParam("showInventory", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(310))).andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.notNullValue()));
+    }
+
+    @Test
+    void testListBeersByBeerNameAndBeerStyleAndNotShowInventory() throws Exception {
+        mockMvc.perform(get(BeerController.BEER_PATH)
+                        .queryParam("beerName", "%IPA%")
+                        .queryParam("beerStyle", "IPA")
+                        .queryParam("showInventory", "false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(310))).andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.nullValue()));
+    }
+
     @Rollback
     @Transactional
     @Test
     void testEmptyListBeers() {
         beerRepository.deleteAll();
-        List<BeerDTO> beers = beerController.listBeers(null, null);
+        List<BeerDTO> beers = beerController.listBeers(null, null, null);
         assertThat(beers.size()).isEqualTo(0);
     }
 
